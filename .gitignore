@@ -139,7 +139,7 @@ cython_debug/
 
 
 # Additional 
-UnderstandingClouds/data
+data/
 *.zip
 *.pdf
 *.pth
