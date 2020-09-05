@@ -140,6 +140,7 @@ cython_debug/
 
 # Additional 
 data/
+data_resized/
 *.zip
 *.pdf
 *.pth
