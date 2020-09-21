@@ -27,7 +27,6 @@ if __name__ == "__main__":
     N_FOLDS = 5
 
 
-    ###################### DATASET CREATION ##############################
     train = pd.read_csv(f"{path}/train.csv")
     train["label"] = train["Image_Label"].apply(lambda x: x.split("_")[1])
     train["im_id"] = train["Image_Label"].apply(lambda x: x.split("_")[0])
@@ -59,7 +58,6 @@ if __name__ == "__main__":
     print(f"validation set {valid_ids[:5]}.. with length {len(valid_ids)}")
     print(f"testing set    {test_ids[:5]}.. with length {len(test_ids)}")
 
-    ############################ DATASET & DATALOADER ############################
 
     num_workers = 2
     bs = 2
@@ -82,8 +80,6 @@ if __name__ == "__main__":
     valid_loader = DataLoader(
         valid_dataset, batch_size=bs, shuffle=False, num_workers=num_workers
     )
-
-    ###################### HYPERPARMATERS ##################################
     model = UNet(n_channels=3, n_classes=4).float()
     model.to(device)
     criterion = BCEDiceLoss(eps=1.0, activation=None)
@@ -91,8 +87,6 @@ if __name__ == "__main__":
     scheduler = torch.optim.lr_scheduler.ReduceLROnPlateau(optimizer,factor=0.2, 
                                                         patience=2, cooldown=2)
 
-
-    ###################### TRAINING LOOP #####################################
     n_epochs = 2
     train_loss_list = []
     valid_loss_list = []
@@ -105,10 +99,7 @@ if __name__ == "__main__":
         train_loss = 0.0
         valid_loss = 0.0
         dice_score = 0.0
-        ###################
-        # train the model #
-        ###################
-        '''
+
         model.train()
         bar = tq(train_loader, postfix={"train_loss":0.0})
         for data, target in bar:
@@ -128,10 +119,7 @@ if __name__ == "__main__":
             # update training loss
             train_loss += loss.item()*data.size(0)
             bar.set_postfix(ordered_dict={"train_loss":loss.item()})
-        '''
-        ######################    
-        # validate the model #
-        ######################
+
         model.eval()
         #del data, target
         with torch.no_grad():
@@ -149,7 +137,6 @@ if __name__ == "__main__":
                 dice_score +=  dice_cof * data.size(0)
                 bar.set_postfix(ordered_dict={"valid_loss":loss.item(), "dice_score":dice_cof})
         
-        # calculate average losses
         train_loss = train_loss/len(train_loader.dataset)
         valid_loss = valid_loss/len(valid_loader.dataset)
         dice_score = dice_score/len(valid_loader.dataset)
@@ -158,11 +145,9 @@ if __name__ == "__main__":
         dice_score_list.append(dice_score)
         lr_rate_list.append([param_group['lr'] for param_group in optimizer.param_groups])
         
-        # print training/validation statistics 
         print('Epoch: {}  Training Loss: {:.6f}  Validation Loss: {:.6f} Dice Score: {:.6f}'.format(
             epoch, train_loss, valid_loss, dice_score))
-        
-        # save model if validation loss has decreased
+
         if valid_loss <= valid_loss_min:
             print('Validation loss decreased ({:.6f} --> {:.6f}).  Saving model ...'.format(
             valid_loss_min,

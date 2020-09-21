@@ -3,16 +3,6 @@ import torch.nn as nn
 import torch.nn.functional as F
 
 def f_score(pr, gt, beta=1, eps=1e-7, threshold=None, activation='sigmoid'):
-    """
-    Args:
-        pr (torch.Tensor): A list of predicted elements
-        gt (torch.Tensor):  A list of elements that are to be predicted
-        eps (float): epsilon to avoid zero division
-        threshold: threshold for outputs binarization
-    Returns:
-        float: IoU (Jaccard) score
-    """
-
     if activation is None or activation == "none":
         activation_fn = lambda x: x
     elif activation == "sigmoid":
@@ -41,8 +31,6 @@ def f_score(pr, gt, beta=1, eps=1e-7, threshold=None, activation='sigmoid'):
 
 
 class DiceLoss(nn.Module):
-    __name__ = 'dice_loss'
-
     def __init__(self, eps=1e-7, activation='sigmoid'):
         super().__init__()
         self.activation = activation
@@ -55,8 +43,6 @@ class DiceLoss(nn.Module):
 
 
 class BCEDiceLoss(DiceLoss):
-    __name__ = 'bce_dice_loss'
-
     def __init__(self, eps=1e-7, activation='sigmoid', lambda_dice=1.0, lambda_bce=1.0):
         super().__init__(eps, activation)
         if activation == None:
