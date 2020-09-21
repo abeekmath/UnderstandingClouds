@@ -12,9 +12,6 @@ from torch.utils.data import Dataset, DataLoader
 
 
 def get_img(x, folder: str = "train_images_525/train_images_525"):
-    """
-    Return image based on image name and folder.
-    """
     img_paths = r'../data_resized/'
     data_folder = f"{img_paths}/{folder}"
     image_path = os.path.join(data_folder, x)
@@ -24,13 +21,6 @@ def get_img(x, folder: str = "train_images_525/train_images_525"):
 
 
 def rle_decode(mask_rle: str = "", shape: tuple = (1400, 2100)):
-    """
-    Decode rle encoded mask.
-
-    :param mask_rle: run-length as string formatted (start length)
-    :param shape: (height, width) of array to return
-    Returns numpy array, 1 - mask, 0 - background
-    """
     s = mask_rle.split()
     starts, lengths = [np.asarray(x, dtype=int) for x in (s[0:][::2], s[1:][::2])]
     starts -= 1
@@ -42,9 +32,6 @@ def rle_decode(mask_rle: str = "", shape: tuple = (1400, 2100)):
 
 
 def make_mask(df: pd.DataFrame, image_name: str = "img.jpg", shape: tuple = (350, 525)):
-    """
-    Create mask based on df, image name and shape.
-    """
     masks = np.zeros((shape[0], shape[1], 4), dtype=np.float32)
     df = df[df["im_id"] == image_name]
     for idx, im_name in enumerate(df["im_id"].values):
@@ -64,18 +51,10 @@ def make_mask(df: pd.DataFrame, image_name: str = "img.jpg", shape: tuple = (350
 
 
 def to_tensor(x, **kwargs):
-    """
-    Convert image or mask.
-    """
     return x.transpose(2, 0, 1).astype("float32")
 
 
 def mask2rle(img):
-    """
-    Convert mask to rle.
-    img: numpy array, 1 - mask, 0 - background
-    Returns run length as string formated
-    """
     pixels = img.T.flatten()
     pixels = np.concatenate([[0], pixels, [0]])
     runs = np.where(pixels[1:] != pixels[:-1])[0] + 1
@@ -84,10 +63,6 @@ def mask2rle(img):
 
 
 def visualize(image, mask, original_image=None, original_mask=None):
-    """
-    Plot image and masks.
-    If two pairs of images and masks are passes, show both.
-    """
     fontsize = 14
     class_dict = {0: "Fish", 1: "Flower", 2: "Gravel", 3: "Sugar"}
 
@@ -121,10 +96,6 @@ def visualize(image, mask, original_image=None, original_mask=None):
 def visualize_with_raw(
     image, mask, original_image=None, original_mask=None, raw_image=None, raw_mask=None
 ):
-    """
-    Plot image and masks.
-    If two pairs of images and masks are passes, show both.
-    """
     fontsize = 14
     class_dict = {0: "Fish", 1: "Flower", 2: "Gravel", 3: "Sugar"}
 
@@ -155,9 +126,6 @@ def visualize_with_raw(
 
 
 def plot_with_augmentation(image, mask, augment):
-    """
-    Wrapper for `visualize` function.
-    """
     augmented = augment(image=image, mask=mask)
     image_flipped = augmented["image"]
     mask_flipped = augmented["mask"]
@@ -171,12 +139,6 @@ def sigmoid(x):
 
 
 def post_process(probability, threshold, min_size):
-    """
-    This is slightly different from other kernels as we draw convex hull here itself.
-    Post processing of each predicted mask, components with lesser number of pixels
-    than `min_size` are ignored
-    """
-    # don't remember where I saw it
     mask = (cv2.threshold(probability, threshold, 1, cv2.THRESH_BINARY)[1])
     mask = draw_convex_hull(mask.astype(np.uint8))
     num_component, component = cv2.connectedComponents(mask.astype(np.uint8))
@@ -207,7 +169,6 @@ def get_training_augmentation():
 
 
 def get_validation_augmentation():
-    """Add paddings to make image shape divisible by 32"""
     test_transform = [
         albu.Resize(320, 640),
         albu.Normalize(mean=(0.485, 0.456, 0.406), std=(0.229, 0.224, 0.225)),
@@ -216,16 +177,6 @@ def get_validation_augmentation():
 
 
 def get_preprocessing(preprocessing_fn):
-    """Construct preprocessing transform
-
-    Args:
-        preprocessing_fn (callbale): data normalization function
-            (can be specific for each pretrained neural network)
-    Return:
-        transform: albumentations.Compose
-
-    """
-
     _transform = [
         albu.Lambda(image=preprocessing_fn),
         albu.Lambda(image=to_tensor, mask=to_tensor),
@@ -247,10 +198,6 @@ def dice_no_threshold(
     eps: float = 1e-7,
     threshold: float = None,
 ):
-    """
-    Reference:
-    https://catalyst-team.github.io/catalyst/_modules/catalyst/dl/utils/criterion/dice.html
-    """
     if threshold is not None:
         outputs = (outputs > threshold).float()
 
