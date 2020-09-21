@@ -4,7 +4,7 @@ Implemented a UNet From Scratch for Cloud Image Segmenation.
 
 ## Table of Contents:
 
-- [UnderstandingClouds]
+- [UnderstandingClouds](#understandingclouds-pytorch)
     - [Data](#data)
     - [Model](#model)
     - [Experiment configs](#experiment-configs)
@@ -16,20 +16,25 @@ Implemented a UNet From Scratch for Cloud Image Segmenation.
 
 
 ### Data:
- 
+- Implementation based on the Max-Planck Dataset for clouds.
 
 ### Model:
+- Implemented Unet and DeepLabV3. Open-sourced Unet implementation. 
+- DeepLabV3 Implementation based on torchvision models. 
 
 
 ### Experiment configs:
 ```
-- Input size: 224 x 224 x 3
-- Batch size: 16
-- Learning rate: 1e-4
+- Input size: 350 x 525 x 3
+- Batch size: 4
+- Learning rate: 5e-4
 - Optimizer: Adam
+- Model was trained locally on a GTX 1050Ti. 
 ```
+
+
 ### Usage:
-- Clone the repository [here](https://github.com/abhirupkamath/DeepPixFace/blob/master/config.py)
+- Clone the repository [here](https://github.com/abhirupkamath/UnderstandingClouds)
 - ``` python main.py ```
 - Runs on a GPU, you need to enable cuda in the config file.
 
@@ -37,7 +42,11 @@ Implemented a UNet From Scratch for Cloud Image Segmenation.
 Achieved a Dice Coefficient of 0.59
 
 ### Requirements:
-Check [requirements.txt](https://github.com/abhirupkamath/DeepPixFace/blob/master/requirements.txt).
+Check [requirements.txt](https://github.com/abhirupkamath/UnderstandingClouds/blob/master/requirements.txt).
+
+### References:
+- RLE Decoding : https://bit.ly/3ceBpCq
+- Convex Hull Creation and Post Processing: https://bit.ly/3hNXVDj
 
 
 ### License:
